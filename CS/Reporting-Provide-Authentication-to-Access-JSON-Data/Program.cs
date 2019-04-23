@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XtraReport_JsonDataSource_with_Authorization {
+namespace Xtrareport_json_datasource_with_authorization {
     static class Program {
         /// <summary>
         /// The main entry point for the application.
@@ -12,7 +12,6 @@ namespace XtraReport_JsonDataSource_with_Authorization {
         [STAThread]
         static void Main() {
             Application.EnableVisualStyles();
-
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }

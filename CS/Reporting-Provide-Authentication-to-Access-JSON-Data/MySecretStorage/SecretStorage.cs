@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace XtraReport_JsonDataSource_with_Authorization.MySecretStorage {
+namespace Xtrareport_json_datasource_with_authorization.MySecretStorage {
     public class SecretStorage {
         const string storageFileName = "data.dat";
         const string stringSeparator = "@";

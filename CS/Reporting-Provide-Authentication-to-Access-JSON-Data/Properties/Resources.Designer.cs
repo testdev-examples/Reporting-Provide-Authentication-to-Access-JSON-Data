@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace XtraReport_JsonDataSource_with_Authorization.Properties {
+namespace Xtrareport_json_datasource_with_authorization.Properties {
 
 
     /// <summary>

@@ -1,43 +1,114 @@
 using DevExpress.DataAccess.Json;
-using DevExpress.DataAccess.UI.Native.Json;
-using DevExpress.DataAccess.UI.Json;
+using DevExpress.XtraReports.UI;
 using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.IO;
+using System.Text;
 using System.Windows.Forms;
-using XtraReport_JsonDataSource_with_Authorization.ReportCustomization;
-using DevExpress.XtraReports.Wizards;
+using Xtrareport_json_datasource_with_authorization.ReportCustomization;
 
-namespace XtraReport_JsonDataSource_with_Authorization
+namespace Xtrareport_json_datasource_with_authorization
 {
     public partial class Form1 : Form {
         public Form1() {
             InitializeComponent();
         }
-        private void DesignTimeAuthenticationButton_Click(object sender, EventArgs e) {
-            var reportDesignTool = new DevExpress.XtraReports.UI.ReportDesignTool(new DevExpress.XtraReports.UI.XtraReport());
-            reportDesignTool.DesignForm.DesignMdiController.AddService(typeof(IWizardCustomizationService), new MyWizardCustomizationService());
-            reportDesignTool.DesignForm.DesignMdiController.AddService(typeof(IJsonEditorsCustomizationService), new MyWizardCustomizationService());
-            reportDesignTool.ShowDesigner();
-        }
-        private void RuntimeAuthenticationButton_Click(object sender, EventArgs e) {
-            var report = new MyReportHelper().CreateReport();
-            report.DataSource = JsonDataSourceAuthorization_Example.CreateCustomJsonDataSource(
-                @"http://northwind.servicestack.net/customers.json", "userName1", "userPassword1");
+
+        private void CreateReportDataSourceFromConnectionStringButton_Click(object sender, EventArgs e) {
+            // XtraReport1 does not have assigned data sources
+            var report = new XtraReport1(); 
+
+            // Create JsonDataSource from the specified connection string
+            var jsonDataSource = CreateReportDataSourceFromConnectionString();
+            // Retrieve data to populate the Report Designer's Field List
+            jsonDataSource.Fill();
+
+            report.DataSource = jsonDataSource;
             report.DataMember = "Customers";
+
             new DevExpress.XtraReports.UI.ReportDesignTool(report).ShowDesigner();
         }
-    }
-    public static class JsonDataSourceAuthorization_Example {
-
-        public static JsonDataSource CreateCustomJsonDataSource(string uri, string userName, string password) {
-            var jsonDatasource = new JsonDataSource() {
-                Name = "jsonDataSource",
-                JsonSource = new MyUriJsonSource() {
-                    Uri = new Uri(uri),
-                    UserName = userName,
-                    Password = password
-                }
+        # region CreateReportDataSourceFromConnectionString
+        public static JsonDataSource CreateReportDataSourceFromConnectionString() {
+            JsonDataSource jsonDataSource = new DevExpress.DataAccess.Json.JsonDataSource() {
+                // The application's configuration file must include the "JsonConnection" connection string
+                ConnectionName = "JsonConnection"
             };
-            return jsonDatasource;
+            return jsonDataSource;
+        }
+
+        private void CreateReportDataSourceWithAuthenticationInCodeButton_Click(object sender, EventArgs e) {
+            // XtraReport1 does not have assigned data sources
+            var report = new XtraReport1();
+
+            // Create JsonDataSource in code
+            JsonDataSource jsonDataSource = CreateReportDataSourceWithAuthenticationInCode();
+            // Retrieve data to populate the Report Designer's Field List
+            jsonDataSource.Fill();
+
+            report.DataSource = jsonDataSource;
+            report.DataMember = "Customers";
+
+            new DevExpress.XtraReports.UI.ReportDesignTool(report).ShowDesigner();
+        }
+        public static JsonDataSource CreateReportDataSourceWithAuthenticationInCode() {
+            // Create a new UriJsonSource object and configure authentication data in it
+            var jsonSource = new DevExpress.DataAccess.Json.UriJsonSource();
+            jsonSource.Uri = new Uri(@"http://northwind.servicestack.net/customers.json");
+
+
+            jsonSource.AuthenticationInfo.UserName = "user";
+            jsonSource.AuthenticationInfo.Password = "pwd";
+
+            jsonSource.HeaderParameters.Add(new HeaderParameter("MyAuthHeader1", "secretToken1"));
+            jsonSource.HeaderParameters.Add(new HeaderParameter("MyAuthHeader2", "secretToken2"));
+
+            jsonSource.QueryParameters.Add(new QueryParameter("id", "123456"));
+            jsonSource.QueryParameters.Add(new QueryParameter("name", "MyName"));
+            // Create a JsonDataSource object and assign the UriJsonSource object to it
+            var jsonDataSource = new DevExpress.DataAccess.Json.JsonDataSource() {
+                JsonSource = jsonSource
+            };
+
+            return jsonDataSource;
+        }
+
+    }
+    public static class JsonDatasourceAuthorization_Example {
+        public static string ConvertReportWithMyUriJsonSourceTo191(string repxContent, out List<string> connectionString) {
+            var report = new XtraReport();
+            using(var ms = new MemoryStream(Encoding.UTF8.GetBytes(repxContent))) {
+                report.LoadLayoutFromXml(ms);
+            }
+
+            connectionString = new List<string>();
+
+            int i = 0;
+            foreach(var component in report.ComponentStorage) {
+                var jsonDS = (component as DevExpress.DataAccess.Json.JsonDataSource);
+                var jsonSource = (jsonDS?.JsonSource as MyUriJsonSource);
+                if(jsonSource != null) {
+                    i++;
+                    jsonDS.ConnectionName = string.Format("newJsonConnection_{0}{1}", report.Name, i.ToString());
+
+                    var builder = new DbConnectionStringBuilder();
+                    builder.Add("Uri", jsonSource.Uri.OriginalString);
+                    builder.Add("UserName", jsonSource.UserName);
+                    builder.Add("Password", jsonSource.Password);
+
+                    connectionString.Add(string.Format("<add name=\"{0}\" connectionString=\"{1}\" providerName=\"JsonSourceProvider\" />",
+                        jsonDS.ConnectionName, builder.ConnectionString));
+
+                    jsonDS.JsonSource = null;
+                }
+            }
+            using(var ms = new MemoryStream()) {
+                report.SaveLayoutToXml(ms);
+                ms.Position = 0;
+                StreamReader reader = new StreamReader(ms);
+                return reader.ReadToEnd();
+            }
         }
     }
 }

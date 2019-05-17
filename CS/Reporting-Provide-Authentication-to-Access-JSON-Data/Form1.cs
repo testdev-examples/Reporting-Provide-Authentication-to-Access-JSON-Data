@@ -57,7 +57,7 @@ namespace Xtrareport_json_datasource_with_authorization
             jsonSource.Uri = new Uri(@"http://northwind.servicestack.net/customers.json");
 
 
-            jsonSource.AuthenticationInfo.UserName = "user";
+            jsonSource.AuthenticationInfo.Username = "user";
             jsonSource.AuthenticationInfo.Password = "pwd";
 
             jsonSource.HeaderParameters.Add(new HeaderParameter("MyAuthHeader1", "secretToken1"));

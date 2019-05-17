@@ -23,42 +23,6 @@ Namespace XtraReport_JsonDataSource_with_Authorization.ReportCustomization
 		Inherits DevExpress.DataAccess.UI.Wizard.Views.ChooseJsonSourcePageView
 		Implements IMyChooseJsonSourcePageView
 
-		Private Property IChooseJsonSourcePageView_ConnectionType() As JsonConnectionType Implements IChooseJsonSourcePageView.ConnectionType
-			Get
-				Return MyBase.ConnectionType
-			End Get
-			Set
-				MyBase.ConnectionType = value
-			End Set
-		End Property
-
-		Private Property IChooseJsonSourcePageView_Json() As String Implements IChooseJsonSourcePageView.Json
-			Get
-				Return MyBase.Json
-			End Get
-			Set
-				MyBase.Json = value
-			End Set
-		End Property
-
-		Private Property IChooseJsonSourcePageView_Uri() As String Implements IChooseJsonSourcePageView.Uri
-			Get
-				Return MyBase.Uri
-			End Get
-			Set
-				MyBase.Uri = value
-			End Set
-		End Property
-
-		Private Property IChooseJsonSourcePageView_FilePath() As String Implements IChooseJsonSourcePageView.FilePath
-			Get
-				Return MyBase.FilePath
-			End Get
-			Set
-				MyBase.FilePath = value
-			End Set
-		End Property
-
 		Public Property UserName() As String Implements IMyChooseJsonSourcePageView.UserName
 			Get
 				Return userNameCtrl.Text
@@ -123,7 +87,7 @@ Namespace XtraReport_JsonDataSource_with_Authorization.ReportCustomization
 				Dim myJsonSource = TryCast(Model.JsonSource, MyUriJsonSource)
 				If myJsonSource IsNot Nothing AndAlso TypeOf View Is IMyChooseJsonSourcePageView Then
 					TryCast(View, IMyChooseJsonSourcePageView).Password = myJsonSource.Password
-					TryCast(View, IMyChooseJsonSourcePageView).UserName = myJsonSource.UserName
+					TryCast(View, IMyChooseJsonSourcePageView).UserName = myJsonSource.Username
 				End If
 			End If
 		End Sub
@@ -138,7 +102,7 @@ Namespace XtraReport_JsonDataSource_with_Authorization.ReportCustomization
 						source = New JsonDataSource With {
 							.JsonSource = New MyUriJsonSource() With {
 								.Uri = New Uri(View.Uri),
-								.UserName = (TryCast(View, IMyChooseJsonSourcePageView))?.UserName,
+								.Username = (TryCast(View, IMyChooseJsonSourcePageView))?.UserName,
 								.Password = (TryCast(View, IMyChooseJsonSourcePageView))?.Password
 							}
 						}
@@ -158,37 +122,37 @@ Namespace XtraReport_JsonDataSource_with_Authorization.ReportCustomization
 		Public Overrides Sub Commit()
 			Model.JsonSource = New MyUriJsonSource() With {
 				.Uri = New Uri(View.Uri),
-				.UserName = (TryCast(View, IMyChooseJsonSourcePageView))?.UserName,
+				.Username = (TryCast(View, IMyChooseJsonSourcePageView))?.UserName,
 				.Password = (TryCast(View, IMyChooseJsonSourcePageView))?.Password
 			}
-			RemoveHandler View.Changed, AddressOf ViewOnChanged
+			View.Changed -= ViewOnChanged
 		End Sub
 	End Class
 	Public Class MyWizardCustomizationService
 		Implements IWizardCustomizationService, IJsonEditorsCustomizationService
 
-		Public Sub CustomizeDataSourceWizard(ByVal tool As IWizardCustomization(Of XtraReportModel)) Implements IWizardCustomizationService.CustomizeDataSourceWizard
+		Public Sub CustomizeDataSourceWizard(ByVal tool As IWizardCustomization(Of XtraReportModel))
 			tool.RegisterPage(Of ChooseJsonSourcePage(Of XtraReportModel), MyChooseJsonSourcePage(Of XtraReportModel))()
 			tool.RegisterPageView(Of IChooseJsonSourcePageView, MyChooseJsonSourcePageView)()
 		End Sub
 
-		Public Sub CustomizeReportWizard(ByVal tool As IWizardCustomization(Of XtraReportModel)) Implements IWizardCustomizationService.CustomizeReportWizard
+		Public Sub CustomizeReportWizard(ByVal tool As IWizardCustomization(Of XtraReportModel))
 			tool.RegisterPage(Of ChooseJsonSourcePage(Of XtraReportModel), MyChooseJsonSourcePage(Of XtraReportModel))()
 			tool.RegisterPageView(Of IChooseJsonSourcePageView, MyChooseJsonSourcePageView)()
 		End Sub
 
-		Public Sub CustomizeWizard(ByVal editor As JsonEditorId, ByVal tool As IWizardCustomization(Of JsonDataSourceModel)) Implements IJsonEditorsCustomizationService.CustomizeWizard
+		Public Sub CustomizeWizard(ByVal editor As JsonEditorId, ByVal tool As IWizardCustomization(Of JsonDataSourceModel))
 			tool.RegisterPage(Of ChooseJsonSourcePage(Of JsonDataSourceModel), MyChooseJsonSourcePage(Of JsonDataSourceModel))()
 			tool.RegisterPageView(Of IChooseJsonSourcePageView, MyChooseJsonSourcePageView)()
 		End Sub
 
-		Public Function TryCreateDataSource(ByVal model As IDataSourceModel, <System.Runtime.InteropServices.Out()> ByRef dataSource As Object, <System.Runtime.InteropServices.Out()> ByRef dataMember As String) As Boolean Implements IWizardCustomizationService.TryCreateDataSource
+		Public Function TryCreateDataSource(ByVal model As IDataSourceModel, <System.Runtime.InteropServices.Out()> ByRef dataSource As Object, <System.Runtime.InteropServices.Out()> ByRef dataMember As String) As Boolean
 			dataSource = Nothing
 			dataMember = model?.DataMember
 			Return False
 		End Function
 
-		Public Function TryCreateReport(ByVal designerHost As IDesignerHost, ByVal model As XtraReportModel, ByVal dataSource As Object, ByVal dataMember As String) As Boolean Implements IWizardCustomizationService.TryCreateReport
+		Public Function TryCreateReport(ByVal designerHost As IDesignerHost, ByVal model As XtraReportModel, ByVal dataSource As Object, ByVal dataMember As String) As Boolean
 			Return False
 		End Function
 	End Class

@@ -31,7 +31,7 @@ namespace Xtrareport_json_datasource_with_authorization
         }
         public static JsonDataSource CreateReportDataSourceFromConnectionString() {
             JsonDataSource jsonDataSource = new DevExpress.DataAccess.Json.JsonDataSource() {
-                // The application's configuration file must include the "JsonConnection" connection string
+                // The application's configuration file should include the "JsonConnection" connection string
                 ConnectionName = "JsonConnection"
             };
             return jsonDataSource;

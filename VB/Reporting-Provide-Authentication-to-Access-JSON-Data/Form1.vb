@@ -33,13 +33,13 @@ Namespace XtraReport_JsonDataSource_with_Authorization
 
 
         Public Shared Function CreateCustomJsonDataSource(ByVal uri As String, ByVal userName As String, ByVal password As String) As JsonDataSource
-            Dim jsonDatasource = New JsonDataSource() With {
-                .Name = "jsonDataSource",
-                .JsonSource = New MyUriJsonSource() With {
-                    .Uri = New Uri(uri),
-                    .Username = userName,
-                    .Password = password
-                }
+            Dim jsonDatasource = New JsonDataSource() With { _
+                .Name = "jsonDataSource", _
+                .JsonSource = New MyUriJsonSource() With { _
+                    .Uri = New Uri(uri), _
+                    .Username = userName, _
+                    .Password = password _
+                } _
             }
             Return jsonDatasource
         End Function

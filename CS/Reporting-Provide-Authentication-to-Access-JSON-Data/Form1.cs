@@ -54,7 +54,7 @@ namespace Xtrareport_json_datasource_with_authorization
         public static JsonDataSource CreateReportDataSourceWithAuthenticationInCode() {
             // Create a new UriJsonSource object and configure authentication data in it
             var jsonSource = new DevExpress.DataAccess.Json.UriJsonSource();
-            jsonSource.Uri = new Uri(@"http://northwind.servicestack.net/customers.json");
+            jsonSource.Uri = new Uri(@"https://raw.githubusercontent.com/DevExpress-Examples/DataSources/master/JSON/customers.json");
 
 
             jsonSource.AuthenticationInfo.Username = "user";

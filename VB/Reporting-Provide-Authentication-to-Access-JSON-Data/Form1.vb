@@ -21,7 +21,7 @@ Namespace XtraReport_JsonDataSource_with_Authorization
         End Sub
         Private Sub RuntimeAuthenticationButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles button2.Click
             Dim report = (New MyReportHelper()).CreateReport()
-            report.DataSource = JsonDataSourceAuthorization_Example.CreateCustomJsonDataSource("http://northwind.servicestack.net/customers.json", "userName1", "userPassword1")
+            report.DataSource = JsonDataSourceAuthorization_Example.CreateCustomJsonDataSource("https://raw.githubusercontent.com/DevExpress-Examples/DataSources/master/JSON/customers.json", "userName1", "userPassword1")
             report.DataMember = "Customers"
             Call (New DevExpress.XtraReports.UI.ReportDesignTool(report)).ShowDesigner()
         End Sub
